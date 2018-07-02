@@ -40,8 +40,13 @@ public class MainActivity extends AppCompatActivity {
         locationClient.registerLocationListener ( new setDistrict () );
         SDKInitializer.initialize ( getApplicationContext () );
         setContentView ( R.layout.activity_main );
+        AlertDialog.Builder builder=new AlertDialog.Builder ( this );
+        builder.setMessage ( "  百度地图调用成功，若出现定位不准的情况，请关掉应用，重新打开即可准确定位" );
+        AlertDialog AD=builder.create ();
+        AD.show ();
         mapView=(MapView)findViewById ( R.id.bmapView );
         baiduMap=mapView.getMap ();
+        baiduMap.setMyLocationEnabled ( true );
         List<String> permissonList=new ArrayList<> (  );
         if(ContextCompat.checkSelfPermission ( MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION )!= PackageManager.PERMISSION_GRANTED)
         {
@@ -90,16 +95,21 @@ public class MainActivity extends AppCompatActivity {
         baiduMap.animateMapStatus ( mapStatusUpdate );
         mapStatusUpdate = MapStatusUpdateFactory.zoomTo(18f);
         baiduMap.animateMapStatus(mapStatusUpdate);
+        if (location.getLatitude () < 24.610804 && location.getLatitude () > 24.608266 && location.getLongitude () > 118.086968 && location.getLongitude () < 118.091504)
+                    Toast.makeText ( MainActivity.this, "在指定教学区域内", Toast.LENGTH_LONG ).show ();
+                else
+                    Toast.makeText ( MainActivity.this, "不在指定教学区域内", Toast.LENGTH_LONG ).show ();
+        MyLocationData.Builder builder=new MyLocationData.Builder ();
+        builder.latitude ( location.getLatitude () );
+        builder.longitude ( location.getLongitude () );
+        MyLocationData myLocationData=builder.build ();
+        baiduMap.setMyLocationData ( myLocationData );
     }
     public class setDistrict implements BDLocationListener {
         @Override
         public void onReceiveLocation(final BDLocation bdLocation) {
                 double latitude = bdLocation.getLatitude ();
                 double longtitude = bdLocation.getLongitude ();
-                if (latitude < 24.610804 && latitude > 24.608266 && longtitude > 118.086968 && longtitude < 118.091504)
-                    Toast.makeText ( MainActivity.this, "在宿舍区域内", Toast.LENGTH_LONG ).show ();
-                else
-                    Toast.makeText ( MainActivity.this, "不在宿舍区域内", Toast.LENGTH_LONG ).show ();
                 btn=(Button)findViewById ( R.id.btn );
                 btn.setOnClickListener ( new View.OnClickListener () {
                     @Override
